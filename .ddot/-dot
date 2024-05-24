@@ -64,8 +64,9 @@ exec {sseP}>/dev/null
     return 1
 }
 
-.now    () { ruby -e 'puts Time.now.to_f' ;}
-.swatch () { echo -n "ruby -e 'puts \"%.3f\" % (Time.now.to_f - $(.now))'" ;}
+.perl   () { perl -MTime::HiRes=time -e"$*" ;}
+.now    () { .perl 'printf "%.9f", time'  ;}
+.swatch () { echo -n .perl 'printf \"%.3f\", time - '$(.now) ;}
 
 
 .tros  () { rev | sort -u | rev; }
