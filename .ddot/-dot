@@ -1,0 +1,74 @@
+exec {ouT}>&1  
+exec {ttY}>&1
+exec {lseP}>&$ouT
+exec {sseP}>/dev/null
+
+
+-say   () { [[ "$#" != 0 ]] && printf "$@"  >&$ouT  ;}
+-sayS  () { [[ "$#" != 0 ]] && printf "$@"  >&$sseP ;}
+-sayL  () { [[ "$#" != 0 ]] && printf "$@"  >&$lseP ;}
+
+-sep   () { -sayL "\n" ; -sayS " " ;}
+-say.  () { -say "$@"  ; -sep      ;}
+
+-oneline () {
+    -sayL "$@"     
+    unset lseP,sseP 
+    exec {lseP}>/dev/null ; exec {sseP}>&$ouT
+}
+
+-morelines () {
+    -sayS "$@" ; -sayS "\n"
+    unset lseP,sseP 
+    exec {sseP}>/dev/null ; exec {lseP}>&$ouT
+}
+
+-esc () {
+    printf "\e[%sm" "$1" >&$ttY
+    -say   "${@:2}"  
+    printf "\e[0m"       >&$ttY 
+}
+
+-paint  () { -esc "1;$1" "${@:2}" ;}
+-green  () { -paint 32 "$@"       ;}
+-red    () { -paint 31 "$@"       ;}
+-blue   () { -paint 34 "$@"       ;}
+-bold   () { -paint 1  "$@"       ;}
+
+-err  () {
+    if [ "$1" = "0" ]; then -green "$1"
+    else                    -red   "$1"   ;fi 
+}
+
+-ask    () {
+    [ -t 0 ]             || return 0
+    -blue "${1:-"Ok? "}"  
+    read -n1 -r           ; -sep
+    [[ $REPLY =~ ^[Yy]$ ]] 
+} 
+
+-eval   () {
+    -bold '$ '      ; -say. "$*";  
+    -ask           || return 1
+    local code="$*" ; shift $#
+    eval "$code"    ; local r=$?
+    # -sayL "↑ "      ; -errL $r  ; -sep
+}
+
+-have () {
+    type $1 &>/dev/null && return 0
+    [[ "$1" == */ ]]  && [[ -d "$1" ]] && return 0
+    [[ "$1" == /* ]]  && [[ -r "$1" ]] && return 0
+    [[ "$1" == ./* ]] && [[ -r "$1" ]] && return 0
+    -say. "Missing %s" "$1"  
+    return 1
+}
+
+.now    () { ruby -e 'puts Time.now.to_f' ;}
+.swatch () { echo -n "ruby -e 'puts \"%.3f\" % (Time.now.to_f - $(.now))'" ;}
+
+
+.tros  () { rev | sort -u | rev; }
+.files () {
+    find -L "$1" \( -type f -not -name "*-" -print \) -or \( -type d -name "*-" -prune \)  | .tros
+}
