@@ -1,32 +1,35 @@
-exec {ouT}>&1  
-exec {ttY}>&1
-exec {lseP}>&$ouT
-exec {sseP}>/dev/null
+exec 11>&1  
+exec 12>&1
+exec 13>&11
+exec 14>/dev/null
 
+export mute_="11>/dev/null"
 
--say   () { [[ "$#" != 0 ]] && printf "$@"  >&$ouT  ;}
--sayS  () { [[ "$#" != 0 ]] && printf "$@"  >&$sseP ;}
--sayL  () { [[ "$#" != 0 ]] && printf "$@"  >&$lseP ;}
+-say   () { [[ "$#" != 0 ]] && printf "$@"  >&11  ;}
+-sayS  () { [[ "$#" != 0 ]] && printf "$@"  >&14 ;}
+-sayL  () { [[ "$#" != 0 ]] && printf "$@"  >&13 ;}
 
 -sep   () { -sayL "\n" ; -sayS " " ;}
 -say.  () { -say "$@"  ; -sep      ;}
 
 -oneline () {
     -sayL "$@"     
-    unset lseP,sseP 
-    exec {lseP}>/dev/null ; exec {sseP}>&$ouT
+    exec 13>/dev/null ; exec 14>&11
 }
 
 -morelines () {
     -sayS "$@" ; -sayS "\n"
-    unset lseP,sseP 
-    exec {sseP}>/dev/null ; exec {lseP}>&$ouT
+    exec 14>/dev/null ; exec 13>&11
 }
 
+mute-   () {
+    eval "$*" 11>/dev/null 12>/dev/null 13>/dev/null 14>/dev/null
+} 
+
 -esc () {
-    printf "\e[%sm" "$1" >&$ttY
+    printf "\e[%sm" "$1" >&12
     -say   "${@:2}"  
-    printf "\e[0m"       >&$ttY 
+    printf "\e[0m"       >&12 
 }
 
 -paint  () { -esc "1;$1" "${@:2}" ;}
