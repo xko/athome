@@ -1,6 +1,5 @@
 **
 !.gitignore
 
-!.dot
-!.dot/**
-
+!.dotrc
+!.dotrc/**
