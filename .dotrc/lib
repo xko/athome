@@ -1,3 +1,5 @@
+DOTRC=${DOTRC:-$(dirname ${BASH_SOURCE[0]})}
+
 exec 11>&1            # UI output  
 exec 12>&1            # terminal escapes
 exec 13>&11           # newline separators (normal mode)
@@ -44,11 +46,23 @@ exec 14>/dev/null     # space separators   (singleline mode)
     fi 
 }
 
+.ask.memo       () {
+    local ansdir=$DOTRC/.answers.tmp
+    local answer
+    mkdir -p "$ansdir"
+    [[ "$1" ]] && .younger "$ansdir/$1" ${2:-5m} && cat "$ansdir/$1" && return
+    read -n1 -r -s answer
+    [[ "$1" ]] && printf "%s" "$answer" > "$ansdir/$1"
+    printf "%s" "$answer" 
+} 
+
 .ask        () {
-    [ -t 0 ]             || return 0
-    .blue "${1:-"Ok? "}"  
-    read -n1 -r           ; .printsep
-    [[ $REPLY =~ ^[Yy]$ ]] 
+    [ -t 0 ] || return 0
+    .blue "${1:-"Ok?"} "
+    shift
+    local answer=$(.ask.memo "$@")
+    .printfs "%s" "$answer"   
+    [[ $answer =~ ^[Yy]$ ]] 
 } 
 
 .eval       () {
@@ -56,8 +70,6 @@ exec 14>/dev/null     # space separators   (singleline mode)
     .ask            || return 1
     local code="$*" ; shift $#
     eval "$code"    
-    # ; local r=$?
-    # -sayL "↑ "      ; -errL $r  ; -sep
 }
 
 .perl       () { perl -MTime::HiRes=time -e"$*" ;}
