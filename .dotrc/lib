@@ -38,8 +38,8 @@ exec 14>/dev/null     # space separators   (singleline mode)
 
 .perr       () {
     local r=$? ; [[ "$#" != 0 ]] && r="$1"
-    if [[ "$r" == 0 ]]; then .green "$1"
-                        else .red   "$1"   
+    if [[ "$r" == 0 ]]; then .green "$r"
+                        else .red   "$r"   
     fi 
 }
 
