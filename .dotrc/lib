@@ -1,4 +1,4 @@
-DOTRC=${DOTRC:-$(dirname ${BASH_SOURCE[0]})}
+dotRC=${DOTRC:-$(dirname ${BASH_SOURCE[0]})}
 
 exec 11>&1            # UI output  
 exec 12>&1            # terminal escapes
@@ -46,14 +46,15 @@ exec 14>/dev/null     # space separators   (singleline mode)
     fi 
 }
 
-DOTRC_DEF_ANSWER=${DOTRC_DEF_ANSWER:-y}
+dotANSWER=${dotANSWER:-y}
 .answer     () {
     local key="$1" age="${2:-5m}" answer 
-    local dir="$DOTRC/.answers" ; mkdir -p "$dir"
+    local dir="$dotRC/.answers" ; mkdir -p "$dir"
+    [[ "$key" == -* ]] && rm -f "$dir/${key#*-}" && return
     
     [[ "$key" ]] && .younger "$dir/$key" $age && cat "$dir/$key" && return
     [ -t 0 ]     && read -n1 -r -s answer     && [[ "$key" ]]    && printf "%s" "$answer" > "$dir/$key"
-    printf "%s" "${answer:-$DOTRC_DEF_ANSWER}" 
+    printf "%s" "${answer:-$dotANSWER}" 
 } 
 
 .ask        () {
@@ -67,6 +68,13 @@ DOTRC_DEF_ANSWER=${DOTRC_DEF_ANSWER:-y}
     .ask            || return 1
     local code="$*" ; shift $#
     eval "$code"    
+}
+
+.evalh      () {
+    .bold '$ '                  ; .printfs "$1" "****";  
+    .ask                        || return 1
+    local code="$(printf "$@")" ; shift $#
+    eval "$code"
 }
 
 .perl       () { perl -MTime::HiRes=time -e"$*" ;}
