@@ -71,8 +71,15 @@ dotANSWER=${dotANSWER:-y}
     eval "$code"    
 }
 
+.printfh    () {
+    local fmt="$1" ; shift
+    local fills=""
+    for arg ; do  fills+=" ####" ; done
+    .printf "$fmt" $fills
+}     
+
 .evalh      () {
-    .bold '$ '                  ; .printf "$1" "****";  
+    .bold '$ '                  ; .printfh "$@" ;  
     .ask                        || return 1
     local code="$(printf "$@")" ; shift $#
     eval "$code"
