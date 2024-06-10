@@ -6,12 +6,13 @@ exec 13>&11           # newline separators (normal mode)
 exec 14>/dev/null     # space separators   (singleline mode) 
 
 
-.printf_     () { [[ "$#" != 0 ]] && printf "$@"  >&11  ;}
-.printf_ln   () { [[ "$#" != 0 ]] && printf "$@"  >&13 ;}
-.printf_sp   () { [[ "$#" != 0 ]] && printf "$@"  >&14 ;}
+.printf_    () { [[ "$#" != 0 ]] && printf "$@"  >&11  ;}
+.printf_ln  () { [[ "$#" != 0 ]] && printf "$@"  >&13 ;}
+.printf_sp  () { [[ "$#" != 0 ]] && printf "$@"  >&14 ;}
 
-.print_br    () { .printf_ln "\n" ; .printf_sp " " ;}
-.printf      () { .printf_  "$@"  ; .print_br        ;}
+.print_br   () { .printf_ln "\n" ; .printf_sp " " ;}
+.printf     () { .printf_  "$@"  ; .print_br        ;}
+
 
 .oneline    () {
     .printf_ln "$@"     
