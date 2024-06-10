@@ -6,20 +6,20 @@ exec 13>&11           # newline separators (normal mode)
 exec 14>/dev/null     # space separators   (singleline mode) 
 
 
-.printf     () { [[ "$#" != 0 ]] && printf "$@"  >&11  ;}
-.printfS    () { [[ "$#" != 0 ]] && printf "$@"  >&13 ;}
-.printfL    () { [[ "$#" != 0 ]] && printf "$@"  >&14 ;}
+.printf_     () { [[ "$#" != 0 ]] && printf "$@"  >&11  ;}
+.printf_ln   () { [[ "$#" != 0 ]] && printf "$@"  >&13 ;}
+.printf_sp   () { [[ "$#" != 0 ]] && printf "$@"  >&14 ;}
 
-.printsep   () { .printfS "\n"  ; .printfL " " ;}
-.printfs    () { .printf "$@"  ; .printsep        ;}
+.print_br    () { .printf_ln "\n" ; .printf_sp " " ;}
+.printf      () { .printf_  "$@"  ; .print_br        ;}
 
 .oneline    () {
-    .printfS "$@"     
+    .printf_ln "$@"     
     exec 13>/dev/null ; exec 14>&11
 }
 
 .morelines  () {
-    .printfL "$@" ; .printfL "\n"
+    .printf_sp "$@" ; .printf_sp "\n"
     exec 14>/dev/null ; exec 13>&11
 }
 
@@ -29,7 +29,7 @@ exec 14>/dev/null     # space separators   (singleline mode)
 
 .esc        () {
     printf  "\e[%sm" "$1" >&12
-    .printf "${@:2}"  
+    .printf_ "${@:2}"  
     printf  "\e[0m"       >&12 
 }
 
@@ -59,19 +59,19 @@ dotANSWER=${dotANSWER:-y}
 
 .ask        () {
     .blue "${1:-"Ok?"} "         ;  shift
-    local answer=$(.answer "$@") ; .printfs "%s" "$answer"   
+    local answer=$(.answer "$@") ; .printf "%s" "$answer"   
     [[ $answer =~ ^[Yy]$ ]] 
 } 
 
 .eval       () {
-    .bold '$ '      ; .printfs "$*";  
+    .bold '$ '      ; .printf "$*";  
     .ask            || return 1
     local code="$*" ; shift $#
     eval "$code"    
 }
 
 .evalh      () {
-    .bold '$ '                  ; .printfs "$1" "****";  
+    .bold '$ '                  ; .printf "$1" "****";  
     .ask                        || return 1
     local code="$(printf "$@")" ; shift $#
     eval "$code"
