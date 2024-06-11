@@ -47,15 +47,14 @@ exec 14>/dev/null     # space separators   (singleline mode)
     fi 
 }
 
-dotANSWER=${dotANSWER:-y}
 .answer     () {
     local key="$1" age="${2:-5m}" answer 
-    local dir="$dotRC/.answers" ; mkdir -p "$dir"
+    local dir="$dotRC/.answers"          ; mkdir -p "$dir"
     [[ "$key" == -* ]] && rm -f "$dir/${key#*-}" && return
     
     [[ "$key" ]] && .younger "$dir/$key" $age && cat "$dir/$key" && return
     [ -t 0 ]     && read -n1 -r -s answer     && [[ "$key" ]]    && printf "%s" "$answer" > "$dir/$key"
-    printf "%s" "${answer:-$dotANSWER}" 
+    printf "%s" "${answer:-${_default:-y}}" 
 } 
 
 .ask        () {
