@@ -49,7 +49,7 @@ exec 14>/dev/null     # space separators   (singleline mode)
 
 .answer     () {
     local key="$1" age="${2:-5m}" answer 
-    local dir="$atHOME/.answers"          ; mkdir -p "$dir"
+    local dir="$atHOME/cache/answers"          ; mkdir -p "$dir"
     [[ "$key" == -* ]] && rm -f "$dir/${key#*-}" && return
     
     [[ "$key" ]] && .younger "$dir/$key" $age && cat "$dir/$key" && return
