@@ -1,4 +1,4 @@
-dotRC=${DOTRC:-$(dirname ${BASH_SOURCE[0]})}
+atHOME=${atHOME:-$(dirname ${BASH_SOURCE[0]})}
 
 exec 11>&1            # UI output  
 exec 12>&1            # terminal escapes
@@ -49,7 +49,7 @@ exec 14>/dev/null     # space separators   (singleline mode)
 
 .answer     () {
     local key="$1" age="${2:-5m}" answer 
-    local dir="$dotRC/.answers"          ; mkdir -p "$dir"
+    local dir="$atHOME/.answers"          ; mkdir -p "$dir"
     [[ "$key" == -* ]] && rm -f "$dir/${key#*-}" && return
     
     [[ "$key" ]] && .younger "$dir/$key" $age && cat "$dir/$key" && return
